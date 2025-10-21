@@ -6,7 +6,7 @@ node {
     stage('TruffleHog Secret Scan') {
         // Run TruffleHog from the Python virtual environment
         sh '''
-            /opt/venv/bin/trufflehog filesystem --path ./ --json > trufflehog-report.json
+            /opt/venv/bin/trufflehog filesystem ./ --json > trufflehog-report.json
         '''
 
         // Archive the TruffleHog JSON report as a build artifact
