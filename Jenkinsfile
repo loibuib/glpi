@@ -20,15 +20,17 @@ node {
         archiveArtifacts allowEmptyArchive: true, artifacts: 'grype-report.json', fingerprint: true
     }
 
-   stage('Dependency-Check Scan') {
+    stage('Dependency-Check Scan') {
         sh 'mkdir -p dependency-check-reports'
-       
+
         dependencyCheck(
             odcInstallation: 'owasp-dc',
-            additionalArguments: '-s ./ -f HTML -o dependency-check-reports --disableYarnAudit --disableNodeAudit'
+            additionalArguments: '-s ./ -f HTML -f XML -o dependency-check-reports --disableYarnAudit --disableNodeAudit'
         )
+
         archiveArtifacts allowEmptyArchive: true, artifacts: 'dependency-check-reports/*.html', fingerprint: true
-       
+        archiveArtifacts allowEmptyArchive: true, artifacts: 'dependency-check-reports/*.xml', fingerprint: true
+
         dependencyCheckPublisher(
             pattern: 'dependency-check-reports/dependency-check-report.xml'
         )
