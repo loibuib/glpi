@@ -20,15 +20,17 @@ node {
         archiveArtifacts allowEmptyArchive: true, artifacts: 'grype-report.json', fingerprint: true
     }
 
-stage('Dependency-Check Scan') {
-        // Run Dependency-Check scan with arguments and specified tool
+   stage('Dependency-Check Scan') {
+        sh 'mkdir -p dependency-check-reports'
+       
         dependencyCheck(
             odcInstallation: 'owasp-dc',
-            additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit'
+            additionalArguments: '-s ./ -f HTML -o dependency-check-reports --disableYarnAudit --disableNodeAudit'
         )
-        // Publish the XML report in Jenkins
+        archiveArtifacts allowEmptyArchive: true, artifacts: 'dependency-check-reports/*.html', fingerprint: true
+       
         dependencyCheckPublisher(
-            pattern: '**/dependency-check-report.xml'
+            pattern: 'dependency-check-reports/dependency-check-report.xml'
         )
     }
 }
