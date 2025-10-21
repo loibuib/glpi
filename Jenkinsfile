@@ -19,9 +19,8 @@ node {
     sh 'grype sbom:sbom.json --output json > grype-report.json'
     archiveArtifacts allowEmptyArchive: true, artifacts: 'grype-report.json', fingerprint: true
   }
-}
 
-stage('OWASP Dependency-Check Vulnerabilities') {
+  stage('OWASP Dependency-Check Vulnerabilities') {
       steps {
         dependencyCheck additionalArguments: ''' 
                     -o './'
@@ -32,3 +31,6 @@ stage('OWASP Dependency-Check Vulnerabilities') {
         dependencyCheckPublisher pattern: 'dependency-check-report.xml'
       }
     }
+}
+
+
