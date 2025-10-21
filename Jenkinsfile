@@ -4,11 +4,21 @@ node {
     }
 
     stage('TruffleHog Secret Scan') {
-        sh 'docker pull trufflesecurity/trufflehog:latest'
+        // Run TruffleHog from the Python virtual environment
         sh '''
-            docker run --rm -v "$PWD:/pwd" trufflesecurity/trufflehog:latest github --repo https://github.com/your/repo --json > trufflehog-report.json
+            /opt/venv/bin/trufflehog filesystem --path ./ --json > trufflehog-report.json
         '''
+
+        // Archive the TruffleHog JSON report as a build artifact
         archiveArtifacts artifacts: 'trufflehog-report.json', allowEmptyArchive: true
+
+        // Optional: Fail build if secrets are found by checking if report is non-empty
+        script {
+            def report = readJSON file: 'trufflehog-report.json'
+            if (report.size() > 0) {
+                error("TruffleHog found secrets in the repository, failing the build!")
+            }
+        }
     }
 
     stage('SonarQube Analysis') {
