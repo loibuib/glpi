@@ -4,19 +4,16 @@ node {
     }
 
     stage('TruffleHog Secret Scan') {
-        // Run TruffleHog from the Python virtual environment
         sh '''
-            /opt/venv/bin/trufflehog filesystem ./ --json > trufflehog-report.json
+            /opt/venv/bin/trufflehog filesystem --repo_path ./ --json > trufflehog-report.json
         '''
 
-        // Archive the TruffleHog JSON report as a build artifact
         archiveArtifacts artifacts: 'trufflehog-report.json', allowEmptyArchive: true
 
-        // Optional: Fail build if secrets are found by checking if report is non-empty
         script {
             def report = readJSON file: 'trufflehog-report.json'
             if (report.size() > 0) {
-                error("TruffleHog found secrets in the repository, failing the build!")
+                error("Secrets found by TruffleHog, failing the build!")
             }
         }
     }
