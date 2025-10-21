@@ -3,6 +3,14 @@ node {
         checkout scm
     }
 
+    stage('TruffleHog Secret Scan') {
+        sh 'docker pull trufflesecurity/trufflehog:latest'
+        sh '''
+            docker run --rm -v "$PWD:/pwd" trufflesecurity/trufflehog:latest github --repo https://github.com/your/repo --json > trufflehog-report.json
+        '''
+        archiveArtifacts artifacts: 'trufflehog-report.json', allowEmptyArchive: true
+    }
+
     stage('SonarQube Analysis') {
         def scannerHome = tool 'SonarScanner'
         withSonarQubeEnv() {
