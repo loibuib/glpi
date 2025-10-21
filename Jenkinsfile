@@ -20,17 +20,15 @@ node {
         archiveArtifacts allowEmptyArchive: true, artifacts: 'grype-report.json', fingerprint: true
     }
 
-stage('OWASP FS SCAN') {
+stage('Dependency-Check Scan') {
         // Run Dependency-Check scan with arguments and specified tool
         dependencyCheck(
             odcInstallation: 'owasp-dc',
             additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit'
         )
-
         // Publish the XML report in Jenkins
         dependencyCheckPublisher(
             pattern: '**/dependency-check-report.xml'
         )
     }
-
 }
